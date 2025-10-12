@@ -59,6 +59,7 @@ class ShoppingCart<T extends CartItem> {
     return `${removed.name} removed from cart.`;
   }
 }
+
 // Test cases
 const cart = new ShoppingCart();
 
