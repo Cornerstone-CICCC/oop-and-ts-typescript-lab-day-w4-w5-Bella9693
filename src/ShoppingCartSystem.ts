@@ -13,7 +13,7 @@ enum Category {
   Vegetable = "Vegetable",
   Electronics = "Electronics",
   Pastry = "Pastry",
-  Cereal = "Cereal"
+  Cereal = "Cereal",
 }
 
 interface CartItem {
@@ -25,35 +25,62 @@ interface CartItem {
 }
 
 class ShoppingCart<T extends CartItem> {
-  cart = []
+  cart: T[] = [];
 
-  addToCart(product) {
-
+  addToCart(product: T): string {
+    const existing = this.cart.find((item) => item.id === product.id);
+    if (existing) {
+      existing.quantity += product.quantity;
+      return `Updated quantity of ${product.name} to ${existing.quantity}.`;
+    }
+    this.cart.push(product);
+    return `${product.name} added to cart.`;
   }
 
-  updateQuantity(id, qty) {
-
+  updateQuantity(id: number, qty: number): string {
+    const product = this.cart.find((item) => item.id === id);
+    if (!product) return "Product not found.";
+    product.quantity = qty;
+    return `Updated quantity of ${product.name} to ${qty}.`;
   }
 
-  getTotalPrice() {
-
+  getTotalPrice(): number {
+    return this.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }
 
-  getProductsOfCategory(category) {
-
+  getProductsOfCategory(category: string): T[] {
+    return this.cart.filter((item) => item.category === category);
   }
 
-  removeFromCart(id) {
-
+  removeFromCart(id: number): string {
+    const index = this.cart.findIndex((item) => item.id === id);
+    if (index === -1) return "Product not found.";
+    const removed = this.cart.splice(index, 1)[0];
+    return `${removed.name} removed from cart.`;
   }
 }
-
 // Test cases
 const cart = new ShoppingCart();
 
-console.log(cart.addToCart({ id: 1, name: "Headphones", price: 50, quantity: 1, category: Category.Electronics })); // "Headphones added to cart."
-console.log(cart.addToCart({ id: 2, name: "Keyboard", price: 100, quantity: 1, category: Category.Electronics })); // "Keyboard added to cart."
+console.log(
+  cart.addToCart({
+    id: 1,
+    name: "Headphones",
+    price: 50,
+    quantity: 1,
+    category: Category.Electronics,
+  })
+); // "Headphones added to cart."
+console.log(
+  cart.addToCart({
+    id: 2,
+    name: "Keyboard",
+    price: 100,
+    quantity: 1,
+    category: Category.Electronics,
+  })
+); // "Keyboard added to cart."
 console.log(cart.updateQuantity(1, 3)); // "Updated quantity of Headphones to 3."
-console.log(cart.getProductsOfCategory("Electronics")) // Should return all electronics
+console.log(cart.getProductsOfCategory("Electronics")); // Should return all electronics
 console.log(cart.getTotalPrice()); // Should return the total cost of items
 console.log(cart.removeFromCart(2)); // "Keyboard removed from cart."

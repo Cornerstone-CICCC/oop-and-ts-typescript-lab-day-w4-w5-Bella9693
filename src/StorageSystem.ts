@@ -9,26 +9,44 @@
 // 6. Implement a method `updateItem` that updates an item by its property value.
 
 class MyStorage<T, U> {
-  items = []
+  items: (T | U)[] = [];
 
-  addItem(item) {
-
+  addItem(item: T | U): string {
+    this.items.push(item);
+    if (typeof item === "object" && item !== null && "name" in item) {
+      return `User ${(item as any).name} added.`;
+    }
+    return `${item} added to storage.`;
   }
 
-  getItems() {
-
+  getItems(): (T | U)[] {
+    return this.items;
   }
 
-  removeItem(id) {
-
+  removeItem(id: T | U): string {
+    const index = this.items.findIndex(
+      (i) => JSON.stringify(i) === JSON.stringify(id)
+    );
+    if (index === -1) return `${id} not found in storage.`;
+    const removed = this.items.splice(index, 1)[0];
+    return `${(removed as any).name || removed} removed from storage.`;
   }
 
-  findItem(prop, val) {
-
+  findItem(prop: string, val: any): T | U | undefined {
+    return this.items.find(
+      (i) => typeof i === "object" && i !== null && (i as any)[prop] === val
+    );
   }
 
-  updateItem(prop, id, update) {
+  updateItem(prop: string, id: any, update: T | U): string {
+    const index = this.items.findIndex(
+      (i) => typeof i === "object" && i !== null && (i as any)[prop] === id
+    );
+    if (index === -1) return `Item not found.`;
 
+    const oldItem = this.items[index];
+    this.items[index] = update;
+    return `${(oldItem as any).name || oldItem} updated successfully.`;
   }
 }
 

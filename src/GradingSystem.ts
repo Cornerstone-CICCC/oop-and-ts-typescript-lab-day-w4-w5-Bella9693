@@ -5,7 +5,7 @@
 // 2. Implement a method `addStudent` that adds a new student with an empty grade list.
 // 3. Implement a method `addGrade` that records a new grade for a student.
 // 4. Implement a method `getAverageGrade` that returns a student’s average grade. (Formula to get average: sumOfAllGrades / numberOfSubjects)
-// 5. Implement a method `getStudentGrades` that returns all recorded grades for a student. 
+// 5. Implement a method `getStudentGrades` that returns all recorded grades for a student.
 // 6. Implement a method `updateSubjectGrade` that updates a subject grade for a student.
 
 interface Grade {
@@ -20,31 +20,50 @@ interface Student {
 }
 
 class Gradebook<T extends Student> {
-  students = []
+  students: T[] = [];
 
-  addStudent(student) {
-
+  addStudent(student: T): string {
+    this.students.push(student);
+    return `${student.name} added to the gradebook.`;
   }
 
-  addGrade(id, grade) {
+  addGrade(id: number, grade: Grade): string {
+    const student = this.students.find((s) => s.id === id);
+    if (!student) return "Student not found";
 
+    student.grades.push(grade);
+    return `Grade recorded for ${grade.subject}.`;
   }
 
-  getAverageGrade(id) {
+  getAverageGrade(id: number): number | string {
+    const student = this.students.find((s) => s.id === id);
+    if (!student) return "Student not found";
+    if (student.grades.length === 0) return 0;
 
+    const total = student.grades.reduce((sum, g) => sum + g.grade, 0);
+    return total / student.grades.length;
   }
 
-  getStudentGrades(id) {
-
+  getStudentGrades(id: number): Grade[] | string {
+    const student = this.students.find((s) => s.id === id);
+    if (!student) return "Student not found";
+    return student.grades;
   }
 
-  updateSubjectGrade(id, subject, newGrade) {
+  updateSubjectGrade(id: number, subject: string, newGrade: number): string {
+    const student = this.students.find((s) => s.id === id);
+    if (!student) return "Student not found";
 
+    const subjectGrade = student.grades.find((g) => g.subject === subject);
+    if (!subjectGrade) return "Subject not found";
+
+    subjectGrade.grade = newGrade;
+    return `${student.name}'s ${subject} grade updated to ${newGrade}`;
   }
 }
 
 // Test cases
-const gradebook = new Gradebook();
+const gradebook = new Gradebook<Student>();
 
 console.log(gradebook.addStudent({ id: 1, name: "Alice", grades: [] })); // "Alice added to the gradebook."
 console.log(gradebook.addGrade(1, { subject: "Math", grade: 90 })); // "Grade recorded for Math."
